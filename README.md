@@ -43,18 +43,18 @@ mvn clean install
 Run the application on workstation:
 
 ````
-java -jar customer-api-xxx.jar
+java -jar customer-api-mysql-xxx.jar
 ````
 
 Create a Docker image:
 
 ````
-docker build -t customer-api:xxx .
+docker build -t customer-api-mysql:xxx .
 ````
 Create a docker container from image: 
 
 ````
-docker run -d -p 8080:8080 --name customer-api customer-api:xxx
+docker run -d -p 8080:8080 --name customer-api-mysql customer-api-mysql:xxx
 ````
 
 Create a Docker image for MYSQL:
