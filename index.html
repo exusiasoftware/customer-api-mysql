@@ -1,0 +1,243 @@
+<html>
+<head>
+    <title>Customers Test Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        #updateForm {
+          margin: 20px;
+        }
+        #addForm {
+          margin: 20px;
+        }
+    </style>
+</head>
+
+<body onload="getCustomers();">
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand">CRM</a>
+      <form class="form-inline">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="searchCustomer()">Search</button>
+      </form>
+    </nav>
+    <!-- Main Content -->
+    <div class="container">
+      <div class="row">
+        <h1>Customers </h1>
+        
+        <table class="table table-striped">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Name</th>
+              <th scope="col">Title</th>
+              <th scope="col">Department</th>
+              <th scope="col">Update</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody id="posts">
+          </tbody>
+    </table>
+    <div>  
+      <form id="addForm">
+        <div class="form-row align-items-center">
+
+          <div class="col-auto">
+            <label class="sr-only" for="inlineFormInput">id</label>
+            <input type="text" class="form-control mb-2" id="id" placeholder="ID">
+          </div>
+
+          <div class="col-auto">
+            <label class="sr-only" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control mb-2" id="name" placeholder="Jane Doe">
+          </div>
+          
+          <div class="col-auto">
+            <label class="sr-only" for="inlineFormInputGroup">Title</label>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" id="title" placeholder="Title">
+            </div>
+          </div>
+      
+          <div class="col-auto">
+            <label class="sr-only" for="inlineFormInputGroup">Department</label>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" id="department" placeholder="Department">
+            </div>
+          </div>
+
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-2" onclick="addCustomer()">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="updateUser">
+        <form id="updateForm">
+          <div class="form-row align-items-center">
+
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInput">id</label>
+              <input type="text" class="form-control mb-2" id="idUpdate" disabled="disabled" >
+            </div>
+
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInput">Name</label>
+              <input type="text" class="form-control mb-2" id="nameUpdate" >
+            </div>
+              
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInputGroup">Title</label>
+              <div class="input-group mb-2">
+                <input type="text" class="form-control" id="titleUpdate" >
+              </div>
+            </div>
+         
+            <div class="col-auto">
+              <label class="sr-only" for="inlineFormInputGroup">Department</label>
+              <div class="input-group mb-2">
+                <input type="text" class="form-control" id="departmentUpdate" >
+              </div>
+            </div>
+
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary mb-2" onclick="updateCustomer()">Update</button>
+            </div>
+            
+          </div>
+        </form>
+      </div> 
+  </div>   
+</body>
+<!-- JavaScript -->
+<script type="text/javascript">
+      var finalResponse = "";
+      var div = document.getElementById( 'updateUser' );
+      div.style.visibility = 'hidden';  
+      
+      function searchCustomer() {
+          var customerName = document.getElementById("search").value;
+          var url  = "http://localhost:8080/customer-api/v1/customer/name/";
+          var xhr  = new XMLHttpRequest();
+          xhr.open('GET', url+customerName, true);
+          var div = document.getElementById('updateUser');
+          div.style.visibility = 'visible'; 
+          xhr.onload = function () {
+            var response = JSON.parse(xhr.responseText);
+            if (xhr.readyState == 4 && xhr.status == "200") {
+              div.style.backgroundColor = 'grey';
+              document.getElementById("idUpdate").value = response.id;
+              document.getElementById("nameUpdate").value = response.name;
+              document.getElementById("titleUpdate").value = response.title;
+              document.getElementById("departmentUpdate").value = response.department;
+            } else {
+              console.log("Could not get customer. Please try again later.");
+            }
+        }
+        xhr.send(null);
+        return false;
+      }
+
+      function updateCustomer() {
+          var xhr = new XMLHttpRequest();
+          var div = document.getElementById( 'updateUser' ); 
+          div.style.visibility = 'hidden'; 
+          var url  = "http://localhost:8080/customer-api/v1/customer/";
+          customerID =  document.getElementById("idUpdate").value,
+          xhr.open('PUT', url+customerID, true);
+          var params = JSON.stringify(
+            {  
+                  name: document.getElementById("nameUpdate").value,
+                  title: document.getElementById("titleUpdate").value,
+                  department: document.getElementById("departmentUpdate").value,
+              }
+          );
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.send(params);
+          return false;
+      }
+      
+      
+      function addCustomer() {
+          var xhr = new XMLHttpRequest();
+          var params = JSON.stringify(
+            {  
+                  id: document.getElementById("id").value,
+                  name: document.getElementById("name").value,
+                  title: document.getElementById("title").value,
+                  department: document.getElementById("department").value,
+              }
+          );
+          xhr.open("POST", "http://localhost:8080/customer-api/v1/customers", true);
+          xhr.setRequestHeader("Content-type", "application/json");
+          xhr.send(params);
+          return false;
+      }
+
+      function getCustomer(customerID) {
+        var url  = "http://localhost:8080/customer-api/v1/customer/";
+        var xhr  = new XMLHttpRequest();
+        xhr.open('GET', url+customerID, true);
+        var div = document.getElementById( 'updateUser' );
+        xhr.onload = function () {
+          var response = JSON.parse(xhr.responseText);
+          if (xhr.readyState == 4 && xhr.status == "200") {
+            div.style.visibility = 'visible';  
+            div.style.backgroundColor = 'grey'
+            document.getElementById("idUpdate").value = response.id
+            document.getElementById("nameUpdate").value = response.name
+            document.getElementById("titleUpdate").value = response.title
+            document.getElementById("departmentUpdate").value = response.department
+          } else {
+            console.log("Could not get customer. Please try again later.");
+          }
+        }
+        xhr.send(null);
+        return false;
+      }
+
+
+      function deleteCustomer(customerID) {
+        var url = "http://localhost:8080/customer-api/v1/customers/";
+        var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", url+customerID, true);
+        xhr.onload = function () {
+          if (xhr.readyState == 4 && xhr.status == "200") {
+            console.log("Success");
+          } else {
+            console.log("Could not get customers. Please try again later.");
+          }
+        }
+        xhr.send(null);  
+        console.log(customerID);
+        location.reload(true);
+      }
+
+      function getCustomers() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:8080/customer-api/v1/customers/all", true);
+        xhr.setRequestHeader("Content-type", "application/json");
+  
+        xhr.onreadystatechange = function(){     
+          if (xhr.readyState == 4 && xhr.status == "200") {
+              var response  = JSON.parse(xhr.responseText);
+              for (var i in response) {
+                  finalResponse +=  
+                          "<tr><th scope='row'>" + response[i].id + "</th><td>"  + response[i].name + "</td><td>" + response[i].title  +  "</td><td>" 
+                          + response[i].department  + "</td><td><button type='button' class='btn btn-outline-primary' onclick='getCustomer("+ response[i].id +")'>Edit</button></td><td><button type='button' class='btn btn-outline-danger' onclick='deleteCustomer("+ response[i].id +")'>Delete</button></td></tr>"
+              } 
+              document.getElementById("posts").innerHTML = finalResponse;
+                  
+          } else {
+              console.log("Could not get customers. Please try again later.");
+          }
+            
+        };
+        xhr.send(null);
+        return false;
+      }
+      
+</script>
+</html>
