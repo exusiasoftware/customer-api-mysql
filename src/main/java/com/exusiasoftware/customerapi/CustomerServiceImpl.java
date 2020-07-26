@@ -6,6 +6,7 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import com.exusiasoftware.customerapi.entities.Customer;
 import com.exusiasoftware.customerapi.repos.CustomerRepository;
 
@@ -17,29 +18,27 @@ public class CustomerServiceImpl implements CustomerService {
 	CustomerRepository repository;
 	
 	
-	
+
 	@Override
-	public List<Customer> getCustomers() {
-	
-		return repository.findAll();
+	public Response getCustomers() {
+		List<Customer> customers = repository.findAll();
+		return Response.ok(customers).build();
 	}
 
 	@Override
-	public Customer getCustomer(int id) {
-	
-		return repository.findById(id).get();
+	public Response getCustomer(int id) {
+		Customer customer = repository.findById(id).get();
+		return Response.ok(customer).build();
 	}
 
 	@Override
 	public Response createCustomer(Customer customer) {
-		
 		Customer savedCustomer = repository.save(customer);
 		return Response.ok(savedCustomer).build();
 	}
 
 	@Override
 	public Response updateCustomer(Customer customer) {
-		 
 		Customer savedCustomer = repository.save(customer);
 		return Response.ok(savedCustomer).build();
 	}

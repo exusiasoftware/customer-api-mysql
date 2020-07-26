@@ -4,9 +4,6 @@ use to test Docker and Kubernetes Microservices
 
 Example solution:
 
-index.html
-
- ![Index.html](webindex.png)
 
 
 ````
@@ -29,21 +26,38 @@ index.html
                     --------------------       
 
 ````
+Create a Docker image for MYSQL:
 
+````
+docker build -t mysql-server-customer-api:xxx -f Dockerfile_MYSQL .
+````
 
+Launch a MYSQL deployment:
 
+``````
+docker run -d -p 3306:3306 --name mysql-server-customer-api mysql-server-customer-api:xxx
+``````
+
+Seed the database:
+
+``````
+docker exec -i mysql-server-customer-api sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < customer.sql
+``````
 
 
 Compile code run:
 
 ````
+docker inspect mysql-server-customer-api | grep IPAddress
+export MYSQL_DB_HOST=IPAddress
 mvn clean install
+(Be sure MYSQL is running)
 ````
 
 Run the application on workstation:
 
 ````
-java -jar customer-api-mysql-xxx.jar
+java -jar customer-api-mysql-1.0.0.jar
 ````
 
 Create a Docker image:
@@ -54,28 +68,8 @@ docker build -t customer-api-mysql:xxx .
 Create a docker container from image: 
 
 ````
-docker run -d -p 8080:8080 --name customer-api-mysql customer-api-mysql:xxx
+docker run -d -p 8080:8080 -e "MYSQL_DB_HOST=IPAddress" --name customer-api-mysql customer-api-mysql:xxx
 ````
-
-Create a Docker image for MYSQL:
-
-````
-docker build -t mysqlserver:1 -f Dockerfile_MYSQL .
-````
-
-Launch a MYSQL deployment:
-
-``````
-docker run -d -p 3306:3306 --name mysqltest mysqlserver:1
-``````
-
-Seed the database:
-
-``````
-docker exec -i mysqltest sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < customer.sql
-``````
-
-
 
 
 Create a Kubernetes Deployment:
@@ -103,7 +97,7 @@ GET /customer-api/v1/customers/all
 Get Customer by id:
 
 ````
-GETT /customer-api/v1/customer/{id}
+GET /customer-api/v1/customer/{id}
 ````
 
 Add a Customer 
